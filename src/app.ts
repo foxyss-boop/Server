@@ -104,6 +104,7 @@ try {
         console.log('Connected to MongoDB cluster');
     });
 
+// hollyyy its 1 am and i just realized how ugly and stupid this is lmao
     (async () => {
         await transporter.verify();
 
