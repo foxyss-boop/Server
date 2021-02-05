@@ -46,8 +46,16 @@ router.post('/blacklist', ValidationMiddleware(BlacklistSchema), async (req: Req
     const { id, reason } = req.body;
 
     try {
-        // this next line is lol, just lol.
-        const user = await UserModel.findById(id) || await UserModel.findOne({ username: id }) || await UserModel.findOne({ email: id }) || await UserModel.findOne({ invite: id }) || await UserModel.findOne({ key: id }) || await UserModel.findOne({ 'discord.id': id.replace('<@!', '').replace('>', '') });
+        const user = await UserModel.findOne({
+            $or: [
+                { _id: id },
+                { username: id },
+                { email: id },
+                { invite: id },
+                { key: id },
+                { 'discord.id': id.replace('<@!', '').replace('>', '') }
+            ]
+        });
 
         if (!user) return res.status(404).json({
             success: false,
@@ -82,7 +90,14 @@ router.get('/users/:id', async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
-        const user = await UserModel.findById(id) || await UserModel.findOne({ username: id }) || await UserModel.findOne({ 'discord.id': id.replace('<@!', '').replace('>', '') }) || await UserModel.findOne({ uid: parseInt(id) || null });
+        const user = await UserModel.findOne({
+            $or: [
+                { _id: id },
+                { username: id },
+                { 'discord.id': id.replace('<@!', '').replace('>', '') },
+                { uid: parseInt(id) || null }
+            ]
+        });
 
         if (!user) return res.status(404).json({
             success: false,
